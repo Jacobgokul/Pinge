@@ -22,11 +22,15 @@ class UserResponse(BaseModel):
     is_active: bool
 
     class Config:
-        orm_mode = True
+        from_attributes = True
 
     @field_validator('user_id', mode="before")
     def uuid_to_str(cls, v):
         if isinstance(v, UUID):
             return str(v)
         return v
+    
+class LoginResponse(BaseModel):
+    access_token: str
+    token_type: str = "bearer"
 
