@@ -65,16 +65,40 @@ The application now includes a complete messaging system with authentication, co
 - Unread count updates in real-time
 - Multi-device support
 
-📋 **Planned:**
-- File upload and media sharing
-- Push notifications (mobile)
-- User profile management
-- Email verification
-- Typing indicators
-- Online/offline status
-- Message search
-- Message reactions/emojis
-- Voice/video calls
+📋 **TODO:**
+
+**Backend:**
+- [ ] Update user profile API (username, email, password)
+- [ ] User avatar/profile picture upload
+- [ ] Email verification on registration
+- [ ] Password reset via email
+- [ ] Message search API
+- [ ] Delete/edit messages API
+- [ ] Typing indicator events via WebSocket
+- [ ] Online/offline status tracking
+
+**Frontend:**
+- [ ] Edit Profile functionality (Settings page)
+- [ ] Notifications settings
+- [ ] Privacy & Security settings
+- [ ] Typing indicators UI
+- [ ] Online/offline user status (real-time)
+- [ ] Message read receipts (checkmarks)
+- [ ] File/image attachments
+- [ ] User search (to find new contacts)
+- [ ] Group member management UI (add/remove from chat screen)
+- [ ] Delete/edit messages UI
+- [ ] Last message preview in conversation list
+- [ ] Infinite scroll for message history
+- [ ] Profile picture upload UI
+
+**Future Enhancements:**
+- [ ] Push notifications (mobile/web)
+- [ ] Message reactions/emojis
+- [ ] Voice/video calls
+- [ ] End-to-end encryption
+- [ ] Message forwarding
+- [ ] Starred/pinned messages
 
 ---
 
@@ -134,10 +158,8 @@ The application now includes a complete messaging system with authentication, co
 
 5. **Run the application**
    ```bash
-   python run.py
-   # Or from backend directory:
-   # cd backend
-   # uvicorn main:app --reload
+   cd backend
+   uvicorn main:app --reload
    ```
 
 6. **Access the API**
@@ -223,7 +245,6 @@ The application now includes a complete messaging system with authentication, co
 
 ```
 pinge/
-├── run.py                      # Application entry point
 ├── requirements.txt            # Python dependencies
 ├── .env                        # Environment variables (not in git)
 ├── README.md                   # This file
@@ -260,10 +281,7 @@ pinge/
 ### Running in Development Mode
 
 ```bash
-# Using run.py (recommended)
-python run.py
-
-# Or directly with uvicorn
+cd backend
 uvicorn main:app --reload --host 0.0.0.0 --port 8000
 ```
 

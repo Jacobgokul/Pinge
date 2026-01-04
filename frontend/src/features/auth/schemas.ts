@@ -1,0 +1,38 @@
+import { z } from 'zod';
+
+/**
+ * Login form validation schema
+ */
+export const loginSchema = z.object({
+  email: z.string().min(1, 'Email is required').email('Invalid email address'),
+  password: z.string().min(1, 'Password is required'),
+});
+
+export type LoginFormData = z.infer<typeof loginSchema>;
+
+/**
+ * Gender options for form select
+ */
+export const GENDER_OPTIONS = ['Male', 'Female', 'Other'] as const;
+
+/**
+ * Register form validation schema
+ */
+export const registerSchema = z.object({
+  username: z
+    .string()
+    .min(3, 'Username must be at least 3 characters')
+    .max(30, 'Username must be at most 30 characters')
+    .regex(/^[a-zA-Z0-9_]+$/, 'Username can only contain letters, numbers, and underscores'),
+  email: z.string().min(1, 'Email is required').email('Invalid email address'),
+  password: z
+    .string()
+    .min(8, 'Password must be at least 8 characters')
+    .regex(/[A-Z]/, 'Password must contain at least one uppercase letter')
+    .regex(/[a-z]/, 'Password must contain at least one lowercase letter')
+    .regex(/[0-9]/, 'Password must contain at least one number'),
+  gender: z.enum(GENDER_OPTIONS, { message: 'Gender is required' }),
+  country: z.string().min(1, 'Country is required'),
+});
+
+export type RegisterFormData = z.infer<typeof registerSchema>;

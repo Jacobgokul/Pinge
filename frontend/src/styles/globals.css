@@ -1,0 +1,156 @@
+@import 'tailwindcss';
+
+/*
+ * Pinge Theme System
+ * Light and Dark themes with semantic color tokens
+ */
+
+/* Light Theme (Default) */
+:root,
+[data-theme='light'] {
+  /* Backgrounds */
+  --background: 0 0% 100%;
+  --background-secondary: 210 20% 98%;
+  --background-tertiary: 210 20% 96%;
+
+  /* Foreground */
+  --foreground: 222 47% 11%;
+  --foreground-secondary: 215 16% 47%;
+  --foreground-muted: 215 20% 65%;
+
+  /* Cards & Surfaces */
+  --card: 0 0% 100%;
+  --card-foreground: 222 47% 11%;
+
+  /* Primary - Trust Blue */
+  --primary: 217 91% 60%;
+  --primary-foreground: 0 0% 100%;
+
+  /* Secondary */
+  --secondary: 210 20% 96%;
+  --secondary-foreground: 222 47% 11%;
+
+  /* Accent - Teal */
+  --accent: 168 84% 40%;
+  --accent-foreground: 0 0% 100%;
+
+  /* Chat Bubbles */
+  --bubble-sent: 217 91% 60%;
+  --bubble-sent-foreground: 0 0% 100%;
+  --bubble-received: 210 20% 96%;
+  --bubble-received-foreground: 222 47% 11%;
+
+  /* Status Colors */
+  --success: 142 76% 36%;
+  --warning: 38 92% 50%;
+  --destructive: 0 84% 60%;
+  --info: 199 89% 48%;
+
+  /* Online Status */
+  --online: 142 76% 36%;
+  --offline: 215 20% 65%;
+  --away: 38 92% 50%;
+
+  /* Borders */
+  --border: 214 32% 91%;
+  --input: 214 32% 91%;
+  --ring: 217 91% 60%;
+
+  /* Radius */
+  --radius: 0.5rem;
+}
+
+/* Dark Theme */
+[data-theme='dark'] {
+  /* Backgrounds */
+  --background: 222 47% 6%;
+  --background-secondary: 222 47% 8%;
+  --background-tertiary: 217 33% 12%;
+
+  /* Foreground */
+  --foreground: 210 40% 98%;
+  --foreground-secondary: 215 20% 65%;
+  --foreground-muted: 215 16% 47%;
+
+  /* Cards & Surfaces */
+  --card: 222 47% 8%;
+  --card-foreground: 210 40% 98%;
+
+  /* Primary - Brighter for dark mode */
+  --primary: 217 91% 65%;
+  --primary-foreground: 222 47% 6%;
+
+  /* Secondary */
+  --secondary: 217 33% 17%;
+  --secondary-foreground: 210 40% 98%;
+
+  /* Accent */
+  --accent: 168 84% 45%;
+  --accent-foreground: 222 47% 6%;
+
+  /* Chat Bubbles */
+  --bubble-sent: 217 91% 55%;
+  --bubble-sent-foreground: 0 0% 100%;
+  --bubble-received: 217 33% 17%;
+  --bubble-received-foreground: 210 40% 98%;
+
+  /* Status Colors */
+  --success: 142 70% 45%;
+  --warning: 38 92% 50%;
+  --destructive: 0 72% 51%;
+  --info: 199 89% 48%;
+
+  /* Online Status */
+  --online: 142 70% 45%;
+  --offline: 215 16% 47%;
+  --away: 38 92% 50%;
+
+  /* Borders */
+  --border: 217 33% 17%;
+  --input: 217 33% 17%;
+  --ring: 217 91% 65%;
+}
+
+/* Base Styles */
+* {
+  border-color: hsl(var(--border));
+}
+
+body {
+  background-color: hsl(var(--background));
+  color: hsl(var(--foreground));
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Scrollbar Styling */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: hsl(var(--border));
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: hsl(var(--foreground-muted));
+}
+
+/* Focus Visible */
+:focus-visible {
+  outline: 2px solid hsl(var(--ring));
+  outline-offset: 2px;
+}
+
+/* Selection */
+::selection {
+  background: hsl(var(--primary) / 0.2);
+  color: hsl(var(--foreground));
+}
