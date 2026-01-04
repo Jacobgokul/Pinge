@@ -78,6 +78,14 @@ async def get_current_user(
     )
     
     try:
+        # Log token for debugging (first 20 chars only for security)
+        logger.debug(f"Received token: {token[:20] if token else 'None'}... (length: {len(token) if token else 0})")
+        
+        # Check if token is empty or invalid format
+        if not token or not token.strip():
+            logger.warning("Empty or whitespace token received")
+            raise credentials_exception
+            
         # Decode JWT token
         payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
         user_id: str = payload.get("sub")
@@ -159,11 +167,12 @@ async def register_user_service(payload: RegisterUser, db: AsyncSession):
             detail="Email already registered, try a different one"
         )
 
-    # Validate password strength (basic check)
-    if len(payload.password) < 8:
+    # Validate password strength
+    from utilities.generic import validate_password_complexity
+    if not validate_password_complexity(payload.password):
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
-            detail="Password must be at least 8 characters long"
+            detail="Password must be at least 8 chars with uppercase, lowercase, number & special char"
         )
 
     new_user = UserRecords(

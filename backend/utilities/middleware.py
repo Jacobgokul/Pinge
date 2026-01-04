@@ -9,6 +9,10 @@ class WrapSuccessResponseMiddleware(BaseHTTPMiddleware):
            request.url.path.startswith("/redoc") or \
            request.url.path.startswith("/openapi.json"):
             return await call_next(request)
+        
+        # Skip OAuth2 token endpoint to maintain OAuth2 spec compatibility
+        if request.url.path == "/authentication/login":
+            return await call_next(request)
 
         response = await call_next(request)
 

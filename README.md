@@ -1,46 +1,80 @@
 # Pinge
 
 Pinge is a real-time messaging application developed and maintained by [Gokul](https://github.com/Jacobgokul).  
-It is being built with a focus on performance, security, and scalability — aiming to offer a clean and modern chat experience.
+It is built with a focus on performance, security, and scalability — aiming to offer a clean and modern chat experience.
 
 ---
 
 ## About
 
 Pinge is designed to serve as a fully functional chat platform where users can register, communicate in real-time, and manage conversations securely.  
-It is built using a modern Python backend stack, and will evolve into a production-grade application with support for WebSocket-based messaging, authentication, and role-based features.
+It is built using a modern Python backend stack and will evolve into a production-grade application with support for WebSocket-based messaging, authentication, and role-based features.
 
 ---
 
 ## Status
 
-🚧 **Active development**  
-Initial modules including user registration, JWT authentication, and database setup are completed. More features are being added in structured phases.
+🚀 **Production-Ready Core Features**  
+The application now includes a complete messaging system with authentication, contact management, direct messaging, group chats, and real-time WebSocket communication.
+
+**Current Version:** v1.0.0  
+**API Endpoints:** 30+  
+**Database Tables:** 8  
+**Real-Time:** WebSocket enabled
 
 ---
 
 ## Features
 
 ✅ **Implemented:**
+
+**Authentication & Security:**
 - User registration with email validation
 - JWT-based authentication with token expiration
 - Session management (multi-device support)
 - Password hashing with bcrypt
-- Protected API routes
+- Protected API routes with OAuth2
 - Proper error handling and logging
 - Health check endpoints
 
-🔄 **In Progress:**
-- WebSocket implementation for real-time messaging
-- Message storage and retrieval
-- Friend/contact management
+**Contact Management:**
+- Send/accept/reject friend requests
+- Contact list management
+- Remove contacts
+
+**Messaging:**
+- Direct messaging between contacts
+- Group chat creation and management
+- Real-time message delivery via WebSocket
+- Message history with pagination
+- Unread message tracking and notifications
+- Mark messages as read functionality
+
+**Group Features:**
+- Create groups with multiple members
+- Add/remove group members (admin only)
+- Promote/demote members (role management)
+- Update group name and description
+- Leave group functionality
+- Delete group (admin/creator only)
+- View group members and their roles
+
+**Real-Time Features:**
+- WebSocket connections for instant messaging
+- Live message notifications
+- Unread count updates in real-time
+- Multi-device support
 
 📋 **Planned:**
-- Group chat functionality
 - File upload and media sharing
-- Push notifications
+- Push notifications (mobile)
 - User profile management
 - Email verification
+- Typing indicators
+- Online/offline status
+- Message search
+- Message reactions/emojis
+- Voice/video calls
 
 ---
 
@@ -52,6 +86,9 @@ Initial modules including user registration, JWT authentication, and database se
 - **Authentication:** JWT (python-jose) + OAuth2
 - **Password Hashing:** Bcrypt
 - **Validation:** Pydantic
+- **Real-Time:** WebSockets
+- **Rate Limiting:** SlowAPI
+- **CORS:** FastAPI middleware
 
 ---
 
@@ -97,14 +134,18 @@ Initial modules including user registration, JWT authentication, and database se
 
 5. **Run the application**
    ```bash
-   cd backend
-   uvicorn main:app --reload
+   python run.py
+   # Or from backend directory:
+   # cd backend
+   # uvicorn main:app --reload
    ```
 
 6. **Access the API**
    - API: http://localhost:8000
-   - Docs: http://localhost:8000/docs (dev mode only)
+   - Swagger Docs: http://localhost:8000/docs (dev mode only)
+   - ReDoc: http://localhost:8000/redoc (dev mode only)
    - Health: http://localhost:8000/health
+   - WebSocket: ws://localhost:8000/ws?token=<jwt_token>
 
 ---
 
@@ -120,6 +161,55 @@ Initial modules including user registration, JWT authentication, and database se
 | GET | `/authentication/me` | Get current user info | Yes |
 | GET | `/authentication/users` | Get all users | Yes |
 
+### Contacts
+
+| Method | Endpoint | Description | Auth Required |
+|--------|----------|-------------|---------------|
+| POST | `/contacts/send-request` | Send friend request | Yes |
+| GET | `/contacts/requests` | Get pending requests | Yes |
+| POST | `/contacts/accept/{request_id}` | Accept friend request | Yes |
+| POST | `/contacts/reject/{request_id}` | Reject friend request | Yes |
+| GET | `/contacts/` | Get your contacts list | Yes |
+| DELETE | `/contacts/{contact_id}` | Remove a contact | Yes |
+
+### Direct Messages
+
+| Method | Endpoint | Description | Auth Required |
+|--------|----------|-------------|---------------|
+| POST | `/messages/direct` | Send direct message | Yes |
+| GET | `/messages/direct/{contact_id}` | Get chat history | Yes |
+| GET | `/messages/unread` | Get all unread messages | Yes |
+| GET | `/messages/unread/count` | Get unread count per contact | Yes |
+| POST | `/messages/mark-read` | Mark specific messages as read | Yes |
+| POST | `/messages/mark-read/contact/{contact_id}` | Mark all from contact as read | Yes |
+
+### Groups
+
+| Method | Endpoint | Description | Auth Required |
+|--------|----------|-------------|---------------|
+| POST | `/messages/groups` | Create new group | Yes |
+| GET | `/messages/groups` | Get your groups | Yes |
+| GET | `/messages/groups/{group_id}/members` | Get group members | Yes |
+| POST | `/messages/groups/{group_id}/members` | Add members (admin only) | Yes |
+| DELETE | `/messages/groups/{group_id}/members/{user_id}` | Remove member (admin only) | Yes |
+| PATCH | `/messages/groups/{group_id}/members/{user_id}/role` | Change member role (admin only) | Yes |
+| PATCH | `/messages/groups/{group_id}` | Update group info (admin only) | Yes |
+| POST | `/messages/groups/{group_id}/leave` | Leave group | Yes |
+| DELETE | `/messages/groups/{group_id}` | Delete group (admin/creator only) | Yes |
+
+### Group Messages
+
+| Method | Endpoint | Description | Auth Required |
+|--------|----------|-------------|---------------|
+| POST | `/messages/groups/{group_id}/messages` | Send group message | Yes |
+| GET | `/messages/groups/{group_id}/messages` | Get group chat history | Yes |
+
+### WebSocket
+
+| Endpoint | Description | Auth Required |
+|----------|-------------|---------------|
+| WS `/ws?token=<jwt>` | Real-time connection | Yes (via query param) |
+
 ### Health
 
 | Method | Endpoint | Description |
@@ -133,24 +223,34 @@ Initial modules including user registration, JWT authentication, and database se
 
 ```
 pinge/
-├── backend/
-│   ├── main.py                 # FastAPI app with lifespan management
-│   ├── config.py               # Configuration and environment settings
-│   ├── database/
-│   │   ├── database.py         # Database connection and session
-│   │   ├── models.py           # SQLAlchemy models
-│   │   └── db_enum.py          # Database enums
-│   ├── routers/
-│   │   └── authentication_api.py  # Authentication endpoints
-│   ├── schema/
-│   │   └── auth_schema.py      # Pydantic schemas
-│   └── utilities/
-│       ├── authentication_service.py  # Auth business logic
-│       ├── exception_handler.py       # Global exception handler
-│       └── middleware.py              # Custom middleware
+├── run.py                      # Application entry point
 ├── requirements.txt            # Python dependencies
-├── .env.example               # Environment variables template
-└── README.md                  # This file
+├── .env                        # Environment variables (not in git)
+├── README.md                   # This file
+└── backend/
+    ├── main.py                 # FastAPI app with lifespan management
+    ├── config.py               # Configuration and environment settings
+    ├── database/
+    │   ├── database.py         # Database connection and session
+    │   ├── models.py           # SQLAlchemy models
+    │   └── db_enum.py          # Database enums (Gender, Roles, Status)
+    ├── routers/
+    │   ├── authentication_api.py   # Authentication endpoints
+    │   ├── contact_api.py          # Contact management endpoints
+    │   ├── message_api.py          # Messaging and group endpoints
+    │   └── websocket_api.py        # WebSocket connection endpoint
+    ├── schema/
+    │   ├── auth_schema.py          # Authentication schemas
+    │   ├── contact_schema.py       # Contact schemas
+    │   └── message_schema.py       # Message and group schemas
+    └── utilities/
+        ├── authentication_service.py   # Auth business logic
+        ├── contact_service.py          # Contact management logic
+        ├── message_service.py          # Messaging and group logic
+        ├── websocket_manager.py        # WebSocket connection manager
+        ├── exception_handler.py        # Global exception handler
+        ├── middleware.py               # Custom middleware
+        └── generic.py                  # Utility functions
 ```
 
 ---
@@ -160,7 +260,25 @@ pinge/
 ### Running in Development Mode
 
 ```bash
+# Using run.py (recommended)
+python run.py
+
+# Or directly with uvicorn
 uvicorn main:app --reload --host 0.0.0.0 --port 8000
+```
+
+### Testing WebSocket Connection
+
+```javascript
+// JavaScript example
+const token = 'your-jwt-token';
+const ws = new WebSocket(`ws://localhost:8000/ws?token=${token}`);
+
+ws.onopen = () => console.log('Connected');
+ws.onmessage = (event) => {
+  const data = JSON.parse(event.data);
+  console.log('Received:', data);
+};
 ```
 
 ### Database Migrations
@@ -183,11 +301,17 @@ alembic upgrade head
 
 ## Security
 
-- JWT tokens expire after 7 days (configurable)
-- Passwords are hashed using bcrypt
-- Session tracking with device fingerprinting
-- Environment-based configuration
-- Proper error handling without exposing internals
+- **JWT tokens** expire after 7 days (configurable)
+- **Passwords** are hashed using bcrypt with salt
+- **Session tracking** with device fingerprinting (IP, user agent, location)
+- **Multi-device support** - Each login creates a separate session
+- **Environment-based configuration** - Secrets in .env file
+- **Protected routes** - OAuth2 bearer token authentication
+- **Input validation** - Pydantic schemas validate all inputs
+- **Error handling** - No internal details exposed to clients
+- **Rate limiting** - SlowAPI prevents abuse
+- **CORS** - Configurable origin restrictions
+- **SQL injection protection** - SQLAlchemy ORM parameterized queries
 
 **Important:** Always set a strong `secret_key` in production!
 
@@ -206,7 +330,21 @@ Contributions are welcome! Please feel free to submit a Pull Request.
 
 ## License
 
-[Add your license here]
+**Polyform Noncommercial License 1.0.0**
+
+This project is licensed under the [Polyform Noncommercial License 1.0.0](LICENSE).
+
+**Summary:**
+- ✅ For research and educational purposes
+- ✅ To fix and raise bugs and issues
+- ❌ Commercial use requires separate permission
+- ❌ Cannot be used for commercial products or services
+
+For the full license text, see the [LICENSE](LICENSE) file.
+
+For commercial licensing inquiries, please contact the developer.
+
+**Required Notice:** Copyright © 2026 Gokul (https://github.com/Jacobgokul)
 
 ---
 

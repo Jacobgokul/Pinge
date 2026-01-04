@@ -23,3 +23,9 @@ python-dotenv==1.0.1
 
 # Utilities
 python-dateutil==2.9.0
+
+# Rate Limiting
+slowapi==0.1.9
+
+# WebSocket
+websockets==14.1

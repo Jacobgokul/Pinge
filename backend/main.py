@@ -45,7 +45,10 @@ app = FastAPI(
     docs_url="/docs" if environment.lower() == "dev" else None,
     redoc_url="/redoc" if environment.lower() == "dev" else None,
     openapi_url="/openapi.json" if environment.lower() == "dev" else None,
-    lifespan=lifespan
+    lifespan=lifespan,
+    swagger_ui_parameters={
+        "persistAuthorization": True,
+    }
 )
 
 # Add middleware
@@ -58,8 +61,32 @@ app.add_exception_handler(HTTPException, universal_exception_handler)
 app.add_exception_handler(Exception, universal_exception_handler)
 
 # Include routers
-from routers import authentication_api
+from routers import authentication_api, contact_api, message_api, websocket_api
 app.include_router(authentication_api.router)
+app.include_router(contact_api.router)
+app.include_router(message_api.router)
+app.include_router(websocket_api.router)
+
+# CORS Middleware
+from fastapi.middleware.cors import CORSMiddleware
+
+origins = ["*"]  # Allow all for dev; restrict in prod as needed
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
+# Rate Limiting
+from slowapi import _rate_limit_exceeded_handler
+from slowapi.errors import RateLimitExceeded
+from utilities.generic import limiter
+
+app.state.limiter = limiter
+app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
 
 
 @app.get("/", tags=["Health"])

@@ -37,6 +37,7 @@ SECRET_KEY = settings.secret_key
 ALGORITHM = settings.algorithm
 
 # Warn if using default secret key
-if settings.secret_key == secrets.token_urlsafe(32):
+import os
+if os.getenv('secret_key') is None:
     import logging
     logging.warning("Using default SECRET_KEY. Set 'secret_key' in .env for production!")
