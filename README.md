@@ -104,6 +104,7 @@ The application now includes a complete messaging system with authentication, co
 
 ## Tech Stack
 
+**Backend:**
 - **Framework:** FastAPI (Python 3.12+)
 - **Database:** PostgreSQL with asyncpg
 - **ORM:** SQLAlchemy (async)
@@ -112,7 +113,15 @@ The application now includes a complete messaging system with authentication, co
 - **Validation:** Pydantic
 - **Real-Time:** WebSockets
 - **Rate Limiting:** SlowAPI
-- **CORS:** FastAPI middleware
+
+**Frontend:**
+- **Framework:** React 19 + TypeScript
+- **Build Tool:** Vite
+- **Routing:** TanStack Router
+- **State Management:** TanStack Query + Zustand
+- **Styling:** Tailwind CSS
+- **UI Components:** Radix UI + shadcn/ui
+- **Real-Time:** WebSocket client
 
 ---
 
@@ -121,8 +130,9 @@ The application now includes a complete messaging system with authentication, co
 ### Prerequisites
 
 - Python 3.12+
+- Node.js 18+
+- pnpm (`npm install -g pnpm`)
 - PostgreSQL database
-- pip or poetry for dependency management
 
 ### Installation
 
@@ -132,7 +142,19 @@ The application now includes a complete messaging system with authentication, co
    cd Pinge
    ```
 
-2. **Create a virtual environment**
+2. **Configure environment variables**
+   ```bash
+   # Copy the example file
+   cp .env.example .env
+
+   # Edit .env with your configuration
+   # - Set a strong secret_key
+   # - Update database credentials
+   ```
+
+### Backend Setup
+
+3. **Create a virtual environment**
    ```bash
    python -m venv env
    # On Windows
@@ -141,22 +163,12 @@ The application now includes a complete messaging system with authentication, co
    source env/bin/activate
    ```
 
-3. **Install dependencies**
+4. **Install dependencies**
    ```bash
    pip install -r requirements.txt
    ```
 
-4. **Configure environment variables**
-   ```bash
-   # Copy the example file
-   cp .env.example .env
-   
-   # Edit .env with your configuration
-   # - Set a strong secret_key
-   # - Update database credentials
-   ```
-
-5. **Run the application**
+5. **Run the backend**
    ```bash
    cd backend
    uvicorn main:app --reload
@@ -168,6 +180,22 @@ The application now includes a complete messaging system with authentication, co
    - ReDoc: http://localhost:8000/redoc (dev mode only)
    - Health: http://localhost:8000/health
    - WebSocket: ws://localhost:8000/ws?token=<jwt_token>
+
+### Frontend Setup
+
+7. **Install dependencies**
+   ```bash
+   cd frontend
+   pnpm install
+   ```
+
+8. **Run the frontend**
+   ```bash
+   pnpm dev
+   ```
+
+9. **Access the app**
+   - App: http://localhost:5173
 
 ---
 
@@ -248,30 +276,43 @@ pinge/
 ├── requirements.txt            # Python dependencies
 ├── .env                        # Environment variables (not in git)
 ├── README.md                   # This file
-└── backend/
-    ├── main.py                 # FastAPI app with lifespan management
-    ├── config.py               # Configuration and environment settings
-    ├── database/
-    │   ├── database.py         # Database connection and session
-    │   ├── models.py           # SQLAlchemy models
-    │   └── db_enum.py          # Database enums (Gender, Roles, Status)
-    ├── routers/
-    │   ├── authentication_api.py   # Authentication endpoints
-    │   ├── contact_api.py          # Contact management endpoints
-    │   ├── message_api.py          # Messaging and group endpoints
-    │   └── websocket_api.py        # WebSocket connection endpoint
-    ├── schema/
-    │   ├── auth_schema.py          # Authentication schemas
-    │   ├── contact_schema.py       # Contact schemas
-    │   └── message_schema.py       # Message and group schemas
-    └── utilities/
-        ├── authentication_service.py   # Auth business logic
-        ├── contact_service.py          # Contact management logic
-        ├── message_service.py          # Messaging and group logic
-        ├── websocket_manager.py        # WebSocket connection manager
-        ├── exception_handler.py        # Global exception handler
-        ├── middleware.py               # Custom middleware
-        └── generic.py                  # Utility functions
+├── backend/
+│   ├── main.py                 # FastAPI app with lifespan management
+│   ├── config.py               # Configuration and environment settings
+│   ├── database/
+│   │   ├── database.py         # Database connection and session
+│   │   ├── models.py           # SQLAlchemy models
+│   │   └── db_enum.py          # Database enums (Gender, Roles, Status)
+│   ├── routers/
+│   │   ├── authentication_api.py   # Authentication endpoints
+│   │   ├── contact_api.py          # Contact management endpoints
+│   │   ├── message_api.py          # Messaging and group endpoints
+│   │   └── websocket_api.py        # WebSocket connection endpoint
+│   ├── schema/
+│   │   ├── auth_schema.py          # Authentication schemas
+│   │   ├── contact_schema.py       # Contact schemas
+│   │   └── message_schema.py       # Message and group schemas
+│   └── utilities/
+│       ├── authentication_service.py   # Auth business logic
+│       ├── contact_service.py          # Contact management logic
+│       ├── message_service.py          # Messaging and group logic
+│       ├── websocket_manager.py        # WebSocket connection manager
+│       ├── exception_handler.py        # Global exception handler
+│       ├── middleware.py               # Custom middleware
+│       └── generic.py                  # Utility functions
+└── frontend/
+    ├── package.json            # Node dependencies
+    ├── vite.config.ts          # Vite configuration
+    ├── tsconfig.json           # TypeScript configuration
+    └── src/
+        ├── main.tsx            # React entry point
+        ├── routes/             # TanStack Router pages
+        ├── features/           # Feature modules (auth, chat, contacts, groups)
+        ├── components/         # Shared UI components
+        ├── services/           # API client and WebSocket manager
+        ├── stores/             # Zustand state stores
+        ├── lib/                # Utilities and constants
+        └── styles/             # Global CSS styles
 ```
 
 ---
