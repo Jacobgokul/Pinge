@@ -86,7 +86,7 @@ interface UserAvatarProps {
   src?: string;
   name: string;
   status?: 'online' | 'offline' | 'away';
-  size?: 'sm' | 'md' | 'lg' | 'xl';
+  size?: 'sm' | 'md' | 'lg' | 'xl' | '2xl';
   className?: string;
 }
 
@@ -95,6 +95,7 @@ const sizeClasses = {
   md: 'h-10 w-10 text-sm',
   lg: 'h-12 w-12 text-base',
   xl: 'h-16 w-16 text-lg',
+  '2xl': 'h-24 w-24 text-2xl',
 };
 
 function UserAvatar({ src, name, status, size = 'md', className }: UserAvatarProps) {

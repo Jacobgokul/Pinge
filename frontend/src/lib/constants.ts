@@ -31,6 +31,7 @@ export const API_ENDPOINTS = {
     UNREAD_COUNT: '/messages/unread/count',
     MARK_READ: '/messages/mark-read',
     MARK_READ_CONTACT: (contactId: string) => `/messages/mark-read/contact/${contactId}`,
+    MARK_READ_GROUP: (groupId: string) => `/messages/mark-read/group/${groupId}`,
   },
 
   // Groups - /messages/groups

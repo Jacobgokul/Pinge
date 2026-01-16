@@ -78,8 +78,20 @@ class UnreadMessageCount(BaseModel):
     contact_name: str
     unread_count: int
     last_message_at: Optional[datetime]
-    
+
     @field_validator('contact_id', mode="before")
+    def uuid_to_str(cls, v):
+        if isinstance(v, UUID):
+            return str(v)
+        return v
+
+class GroupUnreadCount(BaseModel):
+    group_id: str
+    group_name: str
+    unread_count: int
+    last_message_at: Optional[datetime]
+
+    @field_validator('group_id', mode="before")
     def uuid_to_str(cls, v):
         if isinstance(v, UUID):
             return str(v)
@@ -88,6 +100,8 @@ class UnreadMessageCount(BaseModel):
 class UnreadSummary(BaseModel):
     total_unread: int
     contacts_with_unread: List[UnreadMessageCount]
+    groups_with_unread: List[GroupUnreadCount]
+    total_group_unread: int
 
 class MarkAsReadRequest(BaseModel):
     message_ids: List[str]

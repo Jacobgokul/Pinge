@@ -232,6 +232,7 @@ The application now includes a complete messaging system with authentication, co
 | GET | `/messages/unread/count` | Get unread count per contact | Yes |
 | POST | `/messages/mark-read` | Mark specific messages as read | Yes |
 | POST | `/messages/mark-read/contact/{contact_id}` | Mark all from contact as read | Yes |
+| POST | `/messages/mark-read/group/{group_id}` | Mark all group messages as read | Yes |
 
 ### Groups
 

@@ -1,6 +1,7 @@
+from datetime import datetime
 from fastapi import HTTPException, status
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy import select, or_, and_, desc
+from sqlalchemy import select, or_, and_, desc, func
 from database.models import UserRecords, DirectMessage, GroupChat, GroupMember, GroupMessage
 from database.db_enum import GroupRole
 from schema.message_schema import SendDirectMessage, CreateGroup, SendGroupMessage
@@ -264,11 +265,11 @@ async def get_unread_messages_service(current_user: UserRecords, db: AsyncSessio
 
 async def get_unread_count_service(current_user: UserRecords, db: AsyncSession):
     """
-    Get unread message count per contact and total.
+    Get unread message count per contact, per group, and totals.
     """
     from sqlalchemy import func
-    
-    # Get unread count grouped by sender
+
+    # Get unread count for direct messages grouped by sender
     stmt = select(
         DirectMessage.sender_id,
         UserRecords.username,
@@ -282,13 +283,13 @@ async def get_unread_count_service(current_user: UserRecords, db: AsyncSession):
     ).group_by(
         DirectMessage.sender_id, UserRecords.username
     ).order_by(desc('last_message_at'))
-    
+
     result = await db.execute(stmt)
     rows = result.all()
-    
+
     contacts_with_unread = []
     total_unread = 0
-    
+
     for sender_id, sender_name, count, last_msg_at in rows:
         contacts_with_unread.append({
             "contact_id": str(sender_id),
@@ -297,10 +298,54 @@ async def get_unread_count_service(current_user: UserRecords, db: AsyncSession):
             "last_message_at": last_msg_at
         })
         total_unread += count
-    
+
+    # Get unread count for group messages
+    # For each group user is member of, count messages sent after their last_read_at
+    groups_with_unread = []
+    total_group_unread = 0
+
+    # Get all groups user is member of with their last_read_at
+    member_stmt = select(GroupMember, GroupChat).join(
+        GroupChat, GroupMember.group_id == GroupChat.group_id
+    ).where(GroupMember.user_id == current_user.user_id)
+
+    member_result = await db.execute(member_stmt)
+    memberships = member_result.all()
+
+    for membership, group in memberships:
+        # Count messages in this group sent after last_read_at (excluding user's own messages)
+        unread_stmt = select(
+            func.count(GroupMessage.message_id).label('unread_count'),
+            func.max(GroupMessage.sent_at).label('last_message_at')
+        ).where(
+            GroupMessage.group_id == group.group_id,
+            GroupMessage.sent_at > membership.last_read_at,
+            GroupMessage.sender_id != current_user.user_id
+        )
+
+        unread_result = await db.execute(unread_stmt)
+        unread_row = unread_result.first()
+
+        unread_count = unread_row.unread_count or 0
+        last_msg_at = unread_row.last_message_at
+
+        if unread_count > 0:
+            groups_with_unread.append({
+                "group_id": str(group.group_id),
+                "group_name": group.name,
+                "unread_count": unread_count,
+                "last_message_at": last_msg_at
+            })
+            total_group_unread += unread_count
+
+    # Sort groups by last_message_at descending
+    groups_with_unread.sort(key=lambda x: x['last_message_at'] or datetime.min, reverse=True)
+
     return {
         "total_unread": total_unread,
-        "contacts_with_unread": contacts_with_unread
+        "contacts_with_unread": contacts_with_unread,
+        "groups_with_unread": groups_with_unread,
+        "total_group_unread": total_group_unread
     }
 
 async def mark_messages_as_read_service(message_ids: list, current_user: UserRecords, db: AsyncSession):
@@ -365,6 +410,37 @@ async def mark_all_from_contact_as_read_service(contact_id: str, current_user: U
     
     logger.info(f"User {current_user.user_id} marked {marked_count} messages from {contact_id} as read")
     return {"message": f"Marked {marked_count} message(s) as read", "marked_count": marked_count}
+
+async def mark_group_as_read_service(group_id: str, current_user: UserRecords, db: AsyncSession):
+    """
+    Mark all messages in a group as read by updating the user's last_read_at timestamp.
+    """
+    try:
+        group_uuid = UUID(group_id)
+    except ValueError:
+        raise HTTPException(status_code=400, detail="Invalid group ID")
+
+    # Find user's membership in this group
+    member_result = await db.execute(select(GroupMember).where(
+        GroupMember.group_id == group_uuid,
+        GroupMember.user_id == current_user.user_id
+    ))
+    membership = member_result.scalar_one_or_none()
+
+    if not membership:
+        raise HTTPException(status_code=404, detail="You are not a member of this group")
+
+    # Update last_read_at to current database time (use func.now() for consistency with sent_at)
+    from sqlalchemy import update
+    await db.execute(
+        update(GroupMember)
+        .where(GroupMember.id == membership.id)
+        .values(last_read_at=func.now())
+    )
+    await db.commit()
+
+    logger.info(f"User {current_user.user_id} marked group {group_id} as read")
+    return {"message": "Group marked as read", "group_id": group_id}
 
 async def add_group_members_service(group_id: str, user_ids: list, current_user: UserRecords, db: AsyncSession):
     """

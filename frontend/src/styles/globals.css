@@ -1,43 +1,56 @@
+/* Import Outfit font */
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap');
+
 @import 'tailwindcss';
 
 /*
- * Pinge Theme System
- * Light and Dark themes with semantic color tokens
+ * Pinge Theme System - New Design
+ * Modern glassmorphic design with warm color palette
  */
 
-/* Light Theme (Default) */
+/* Light Theme */
 :root,
 [data-theme='light'] {
   /* Backgrounds */
-  --background: 0 0% 100%;
-  --background-secondary: 210 20% 98%;
-  --background-tertiary: 210 20% 96%;
+  --background: 220 20% 97%;
+  --background-secondary: 220 20% 94%;
+  --background-tertiary: 220 20% 91%;
+  --background-glass: 0 0% 100% / 0.8;
 
   /* Foreground */
   --foreground: 222 47% 11%;
-  --foreground-secondary: 215 16% 47%;
-  --foreground-muted: 215 20% 65%;
+  --foreground-secondary: 220 13% 46%;
+  --foreground-muted: 220 13% 60%;
 
   /* Cards & Surfaces */
   --card: 0 0% 100%;
   --card-foreground: 222 47% 11%;
 
-  /* Primary - Trust Blue */
-  --primary: 217 91% 60%;
+  /* Primary - Coral Red */
+  --primary: 4 90% 58%;
+  --primary-hover: 4 90% 52%;
   --primary-foreground: 0 0% 100%;
 
   /* Secondary */
-  --secondary: 210 20% 96%;
+  --secondary: 220 20% 94%;
   --secondary-foreground: 222 47% 11%;
 
-  /* Accent - Teal */
-  --accent: 168 84% 40%;
-  --accent-foreground: 0 0% 100%;
+  /* Accent Colors */
+  --accent-coral: 4 90% 58%;
+  --accent-cyan: 195 100% 50%;
+  --accent-gold: 43 96% 56%;
+  --accent-pink: 316 73% 69%;
+  --accent-purple: 265 89% 66%;
+
+  /* Gradients */
+  --gradient-primary: linear-gradient(135deg, hsl(4 90% 58%) 0%, hsl(24 95% 53%) 100%);
+  --gradient-accent: linear-gradient(135deg, hsl(195 100% 50%) 0%, hsl(199 89% 48%) 100%);
+  --gradient-pink: linear-gradient(135deg, hsl(316 73% 69%) 0%, hsl(330 81% 60%) 100%);
 
   /* Chat Bubbles */
-  --bubble-sent: 217 91% 60%;
+  --bubble-sent: 4 90% 58%;
   --bubble-sent-foreground: 0 0% 100%;
-  --bubble-received: 210 20% 96%;
+  --bubble-received: 220 20% 94%;
   --bubble-received-foreground: 222 47% 11%;
 
   /* Status Colors */
@@ -48,51 +61,65 @@
 
   /* Online Status */
   --online: 142 76% 36%;
-  --offline: 215 20% 65%;
+  --offline: 220 13% 60%;
   --away: 38 92% 50%;
 
   /* Borders */
-  --border: 214 32% 91%;
-  --input: 214 32% 91%;
-  --ring: 217 91% 60%;
+  --border: 220 20% 88%;
+  --border-light: 220 20% 92%;
+  --input: 220 20% 88%;
+  --ring: 4 90% 58%;
 
   /* Radius */
-  --radius: 0.5rem;
+  --radius: 0.75rem;
+  --radius-lg: 1.25rem;
+  --radius-xl: 1.5rem;
+  --radius-2xl: 2rem;
+
+  /* Shadows */
+  --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+  --shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+  --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1);
 }
 
 /* Dark Theme */
 [data-theme='dark'] {
   /* Backgrounds */
-  --background: 222 47% 6%;
-  --background-secondary: 222 47% 8%;
-  --background-tertiary: 217 33% 12%;
+  --background: 230 25% 5%;
+  --background-secondary: 230 25% 7%;
+  --background-tertiary: 230 20% 10%;
+  --background-glass: 230 25% 8% / 0.9;
 
   /* Foreground */
-  --foreground: 210 40% 98%;
-  --foreground-secondary: 215 20% 65%;
-  --foreground-muted: 215 16% 47%;
+  --foreground: 0 0% 98%;
+  --foreground-secondary: 220 13% 65%;
+  --foreground-muted: 220 13% 50%;
 
   /* Cards & Surfaces */
-  --card: 222 47% 8%;
-  --card-foreground: 210 40% 98%;
+  --card: 230 25% 8%;
+  --card-foreground: 0 0% 98%;
 
-  /* Primary - Brighter for dark mode */
-  --primary: 217 91% 65%;
-  --primary-foreground: 222 47% 6%;
+  /* Primary - Coral Red */
+  --primary: 4 90% 60%;
+  --primary-hover: 4 90% 65%;
+  --primary-foreground: 0 0% 100%;
 
   /* Secondary */
-  --secondary: 217 33% 17%;
-  --secondary-foreground: 210 40% 98%;
+  --secondary: 230 20% 12%;
+  --secondary-foreground: 0 0% 98%;
 
-  /* Accent */
-  --accent: 168 84% 45%;
-  --accent-foreground: 222 47% 6%;
+  /* Accent Colors */
+  --accent-coral: 4 90% 60%;
+  --accent-cyan: 195 100% 50%;
+  --accent-gold: 43 96% 56%;
+  --accent-pink: 316 73% 72%;
+  --accent-purple: 265 89% 70%;
 
   /* Chat Bubbles */
-  --bubble-sent: 217 91% 55%;
+  --bubble-sent: 4 90% 55%;
   --bubble-sent-foreground: 0 0% 100%;
-  --bubble-received: 217 33% 17%;
-  --bubble-received-foreground: 210 40% 98%;
+  --bubble-received: 230 20% 15%;
+  --bubble-received-foreground: 0 0% 98%;
 
   /* Status Colors */
   --success: 142 70% 45%;
@@ -102,13 +129,19 @@
 
   /* Online Status */
   --online: 142 70% 45%;
-  --offline: 215 16% 47%;
+  --offline: 220 13% 50%;
   --away: 38 92% 50%;
 
   /* Borders */
-  --border: 217 33% 17%;
-  --input: 217 33% 17%;
-  --ring: 217 91% 65%;
+  --border: 230 20% 15%;
+  --border-light: 230 20% 12%;
+  --input: 230 20% 15%;
+  --ring: 4 90% 60%;
+
+  /* Shadows */
+  --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.3);
+  --shadow: 0 4px 6px -1px rgb(0 0 0 / 0.4);
+  --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.5);
 }
 
 /* Base Styles */
@@ -116,10 +149,14 @@
   border-color: hsl(var(--border));
 }
 
+html {
+  scroll-behavior: smooth;
+}
+
 body {
   background-color: hsl(var(--background));
   color: hsl(var(--foreground));
-  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  font-family: 'Outfit', 'Inter', system-ui, -apple-system, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
@@ -153,4 +190,189 @@ body {
 ::selection {
   background: hsl(var(--primary) / 0.2);
   color: hsl(var(--foreground));
+}
+
+/* Gradient Text Utility */
+.gradient-text {
+  background: linear-gradient(135deg, hsl(var(--accent-coral)) 0%, hsl(var(--accent-gold)) 50%, hsl(var(--accent-cyan)) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* Glass Effect */
+.glass {
+  background: hsl(var(--background-glass));
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+}
+
+.glass-card {
+  background: hsl(var(--card) / 0.8);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid hsl(var(--border-light));
+}
+
+/* Gradient Backgrounds */
+.bg-gradient-primary {
+  background: linear-gradient(135deg, hsl(var(--accent-coral)) 0%, hsl(24 95% 53%) 100%);
+}
+
+.bg-gradient-accent {
+  background: linear-gradient(135deg, hsl(var(--accent-cyan)) 0%, hsl(199 89% 48%) 100%);
+}
+
+.bg-gradient-pink {
+  background: linear-gradient(135deg, hsl(var(--accent-pink)) 0%, hsl(330 81% 60%) 100%);
+}
+
+.bg-gradient-purple {
+  background: linear-gradient(135deg, hsl(var(--accent-purple)) 0%, hsl(250 89% 60%) 100%);
+}
+
+/* Animated Background Orbs */
+.bg-orb {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(80px);
+  opacity: 0.5;
+  pointer-events: none;
+}
+
+.bg-orb-coral {
+  background: hsl(var(--accent-coral));
+}
+
+.bg-orb-cyan {
+  background: hsl(var(--accent-cyan));
+}
+
+.bg-orb-pink {
+  background: hsl(var(--accent-pink));
+}
+
+/* Floating Dock Animation */
+@keyframes dock-bounce {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-4px); }
+}
+
+.dock-item-active {
+  animation: dock-bounce 0.3s ease-out;
+}
+
+/* Page Transitions */
+.page-enter {
+  opacity: 0;
+  transform: translateY(10px);
+}
+
+.page-enter-active {
+  opacity: 1;
+  transform: translateY(0);
+  transition: opacity 200ms ease-out, transform 200ms ease-out;
+}
+
+/* Card Hover Effect */
+.card-hover {
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.card-hover:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-lg);
+}
+
+/* Bento Grid */
+.bento-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1rem;
+}
+
+@media (min-width: 768px) {
+  .bento-grid {
+    gap: 1.25rem;
+  }
+}
+
+@media (min-width: 1024px) {
+  .bento-grid {
+    gap: 1.5rem;
+  }
+}
+
+/* Status Indicator Pulse */
+@keyframes pulse-online {
+  0%, 100% { box-shadow: 0 0 0 0 hsl(var(--online) / 0.4); }
+  50% { box-shadow: 0 0 0 4px hsl(var(--online) / 0); }
+}
+
+.status-online-pulse {
+  animation: pulse-online 2s ease-in-out infinite;
+}
+
+/* Message Bubble Animations */
+@keyframes message-in {
+  from {
+    opacity: 0;
+    transform: translateY(10px) scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.message-animate {
+  animation: message-in 0.2s ease-out;
+}
+
+/* Typing Indicator */
+@keyframes typing-dot {
+  0%, 60%, 100% { transform: translateY(0); }
+  30% { transform: translateY(-6px); }
+}
+
+.typing-dot {
+  animation: typing-dot 1.4s ease-in-out infinite;
+}
+
+.typing-dot:nth-child(2) { animation-delay: 0.2s; }
+.typing-dot:nth-child(3) { animation-delay: 0.4s; }
+
+/* Responsive Container */
+.container-app {
+  width: 100%;
+  max-width: 100%;
+  margin: 0 auto;
+  padding: 0 1rem;
+}
+
+@media (min-width: 640px) {
+  .container-app {
+    padding: 0 1.5rem;
+  }
+}
+
+@media (min-width: 1024px) {
+  .container-app {
+    padding: 0 2rem;
+  }
+}
+
+@media (min-width: 1536px) {
+  .container-app {
+    max-width: 1536px;
+  }
+}
+
+/* Safe Area Padding for Mobile */
+.safe-bottom {
+  padding-bottom: max(1rem, env(safe-area-inset-bottom));
+}
+
+.safe-top {
+  padding-top: max(1rem, env(safe-area-inset-top));
 }
