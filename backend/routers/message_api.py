@@ -31,6 +31,7 @@ from utilities.message_service import (
     get_unread_count_service,
     mark_messages_as_read_service,
     mark_all_from_contact_as_read_service,
+    mark_group_as_read_service,
     add_group_members_service,
     remove_group_member_service,
     change_group_role_service,
@@ -160,6 +161,18 @@ async def mark_all_from_contact_as_read(
     Useful when opening a chat conversation.
     """
     return await mark_all_from_contact_as_read_service(contact_id, current_user, db)
+
+@router.post("/mark-read/group/{group_id}")
+async def mark_group_as_read(
+    group_id: str,
+    current_user: UserRecords = Depends(get_current_active_user),
+    db: AsyncSession = Depends(get_db)
+):
+    """
+    Mark all messages in a group as read.
+    Updates the user's last_read_at timestamp for this group.
+    """
+    return await mark_group_as_read_service(group_id, current_user, db)
 
 @router.post("/groups/{group_id}/members", status_code=status.HTTP_201_CREATED)
 async def add_group_members(

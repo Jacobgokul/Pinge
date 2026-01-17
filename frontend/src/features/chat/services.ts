@@ -53,4 +53,11 @@ export const chatService = {
   async markContactAsRead(contactId: string): Promise<void> {
     await apiClient.post(API_ENDPOINTS.MESSAGES.MARK_READ_CONTACT(contactId));
   },
+
+  /**
+   * Mark all messages in a group as read
+   */
+  async markGroupAsRead(groupId: string): Promise<void> {
+    await apiClient.post(API_ENDPOINTS.MESSAGES.MARK_READ_GROUP(groupId));
+  },
 };

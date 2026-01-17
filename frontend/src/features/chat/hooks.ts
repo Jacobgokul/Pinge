@@ -92,6 +92,20 @@ export function useMarkAsRead() {
 }
 
 /**
+ * Hook for marking group messages as read
+ */
+export function useMarkGroupAsRead() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (groupId: string) => chatService.markGroupAsRead(groupId),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.MESSAGES.UNREAD_COUNT });
+    },
+  });
+}
+
+/**
  * Hook for real-time message updates via WebSocket
  * Automatically updates the messages cache when new messages arrive
  */

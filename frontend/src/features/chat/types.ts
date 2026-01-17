@@ -48,11 +48,23 @@ export interface UnreadMessageCount {
 }
 
 /**
+ * Unread message count per group
+ */
+export interface GroupUnreadCount {
+  group_id: string;
+  group_name: string;
+  unread_count: number;
+  last_message_at: string | null;
+}
+
+/**
  * Unread summary response
  */
 export interface UnreadSummary {
   total_unread: number;
   contacts_with_unread: UnreadMessageCount[];
+  groups_with_unread: GroupUnreadCount[];
+  total_group_unread: number;
 }
 
 /**

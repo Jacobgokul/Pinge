@@ -114,6 +114,7 @@ class GroupMember(BaseModel):
     user_id = Column(UUID(as_uuid=True), ForeignKey("user_records.user_id"), nullable=False)
     role = Column(SQLAEnum(GroupRole, name="group_role"), default=GroupRole.Member, nullable=False)
     joined_at = Column(DateTime, default=func.now(), nullable=False)
+    last_read_at = Column(DateTime, default=func.now(), nullable=False)
 
     group = relationship("GroupChat", back_populates="members")
     user = relationship("UserRecords")

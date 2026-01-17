@@ -1,26 +1,36 @@
 import { useMemo, useCallback, useEffect } from 'react';
-import { Phone, Video, MoreVertical, ArrowLeft } from 'lucide-react';
+import { useNavigate } from '@tanstack/react-router';
+import { Phone, Video, MoreVertical, ArrowLeft, Info, User, UserMinus } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { UserAvatar } from '@/components/ui/avatar';
 import { LoadingSpinner } from '@/components/common';
-import { EmptyState } from '@/components/common';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+  DropdownMenuSeparator,
+} from '@/components/ui/dropdown-menu';
 import { SimpleMessageList } from './message-list';
 import { MessageInput } from './message-input';
 import { useDirectMessages, useSendDirectMessage, useMarkAsRead, useMessageSubscription } from '../hooks';
 import { useAuthStore } from '@/stores/auth.store';
 import { useChatStore } from '@/stores/chat.store';
-import { useContacts } from '@/features/contacts/hooks';
+import { useContacts, useRemoveContact } from '@/features/contacts/hooks';
+import { cn } from '@/lib/utils';
 
 interface ChatWindowProps {
   onBack?: () => void;
 }
 
 /**
- * Main chat window with header, messages, and input
+ * Main chat window with immersive full-screen design
  */
 function ChatWindow({ onBack }: ChatWindowProps) {
+  const navigate = useNavigate();
   const user = useAuthStore((s) => s.user);
   const activeContactId = useChatStore((s) => s.activeContactId);
+  const setActiveContact = useChatStore((s) => s.setActiveContact);
 
   // Fetch contacts to get the active contact's info
   const { data: contacts } = useContacts();
@@ -30,6 +40,7 @@ function ChatWindow({ onBack }: ChatWindowProps) {
   const messagesQuery = useDirectMessages(activeContactId);
   const sendMessage = useSendDirectMessage();
   const markAsRead = useMarkAsRead();
+  const removeContact = useRemoveContact();
 
   // Subscribe to real-time messages via WebSocket
   useMessageSubscription(activeContactId);
@@ -75,48 +86,106 @@ function ChatWindow({ onBack }: ChatWindowProps) {
   // No conversation selected
   if (!activeContactId) {
     return (
-      <div className="flex h-full flex-col items-center justify-center bg-[hsl(var(--background))]">
-        <EmptyState
-          title="Select a conversation"
-          description="Choose a contact from the list to start messaging"
-        />
+      <div className="flex h-full w-full flex-col items-center justify-center bg-[hsl(var(--background))]">
+        <div className="text-center px-4">
+          <div className="w-20 h-20 mx-auto mb-6 rounded-2xl bg-gradient-primary flex items-center justify-center opacity-20">
+            <span className="text-4xl font-bold text-white">P</span>
+          </div>
+          <h2 className="text-xl font-semibold mb-2">Welcome to Pinge</h2>
+          <p className="text-[hsl(var(--foreground-muted))]">
+            Select a conversation to start messaging
+          </p>
+        </div>
       </div>
     );
   }
 
   return (
-    <div className="flex h-full flex-col bg-[hsl(var(--background))]">
+    <div className="flex h-full w-full flex-col bg-[hsl(var(--background))]">
       {/* Header */}
-      <header className="flex h-16 items-center justify-between border-b border-[hsl(var(--border))] bg-[hsl(var(--card))] px-4">
+      <header className={cn(
+        'flex items-center justify-between px-4 sm:px-6 py-4',
+        'bg-[hsl(var(--card))] border-b border-[hsl(var(--border))]',
+        'sticky top-0 z-10'
+      )}>
         <div className="flex items-center gap-3">
           {/* Back button on mobile */}
           {onBack && (
-            <Button variant="ghost" size="icon" onClick={onBack} className="lg:hidden">
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={onBack}
+              className="lg:hidden w-10 h-10 rounded-xl"
+            >
               <ArrowLeft className="h-5 w-5" />
             </Button>
           )}
 
           {/* Avatar and name */}
-          <UserAvatar name={activeContact?.username || 'Contact'} size="sm" />
+          <UserAvatar name={activeContact?.username || 'Contact'} size="md" />
           <div>
-            <h2 className="font-semibold">{activeContact?.username || 'Loading...'}</h2>
+            <h2 className="font-semibold text-lg">{activeContact?.username || 'Loading...'}</h2>
             <p className="text-xs text-[hsl(var(--foreground-muted))]">
-              {activeContact?.email || ''}
+              {activeContact?.email || 'Online'}
             </p>
           </div>
         </div>
 
         {/* Actions */}
-        <div className="flex items-center gap-1">
-          <Button variant="ghost" size="icon">
+        <div className="flex items-center gap-1 sm:gap-2">
+          <Button
+            variant="ghost"
+            size="icon"
+            className="w-10 h-10 rounded-xl hidden sm:flex"
+            title="Voice call (coming soon)"
+          >
             <Phone className="h-5 w-5" />
           </Button>
-          <Button variant="ghost" size="icon">
+          <Button
+            variant="ghost"
+            size="icon"
+            className="w-10 h-10 rounded-xl hidden sm:flex"
+            title="Video call (coming soon)"
+          >
             <Video className="h-5 w-5" />
           </Button>
-          <Button variant="ghost" size="icon">
-            <MoreVertical className="h-5 w-5" />
-          </Button>
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button
+                variant="ghost"
+                size="icon"
+                className="w-10 h-10 rounded-xl"
+              >
+                <Info className="h-5 w-5 sm:hidden" />
+                <MoreVertical className="h-5 w-5 hidden sm:block" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" className="w-48 rounded-xl">
+              <DropdownMenuItem
+                className="rounded-lg cursor-pointer"
+                onClick={() => navigate({ to: '/contacts' })}
+              >
+                <User className="w-4 h-4 mr-2" />
+                View Contact
+              </DropdownMenuItem>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem
+                className="rounded-lg cursor-pointer text-[hsl(var(--destructive))] focus:text-[hsl(var(--destructive))]"
+                onClick={() => {
+                  if (!activeContactId) return;
+                  removeContact.mutate(activeContactId, {
+                    onSuccess: () => {
+                      setActiveContact(null);
+                      onBack?.();
+                    },
+                  });
+                }}
+              >
+                <UserMinus className="w-4 h-4 mr-2" />
+                Remove Contact
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
         </div>
       </header>
 
@@ -126,11 +195,16 @@ function ChatWindow({ onBack }: ChatWindowProps) {
           <LoadingSpinner size="lg" />
         </div>
       ) : formattedMessages.length === 0 ? (
-        <div className="flex flex-1 items-center justify-center">
-          <EmptyState
-            title="No messages yet"
-            description="Send a message to start the conversation"
-          />
+        <div className="flex flex-1 items-center justify-center px-4">
+          <div className="text-center">
+            <div className="w-16 h-16 mx-auto mb-4 rounded-2xl bg-[hsl(var(--secondary))] flex items-center justify-center">
+              <UserAvatar name={activeContact?.username || 'User'} size="lg" />
+            </div>
+            <h3 className="font-semibold mb-1">Start a conversation</h3>
+            <p className="text-sm text-[hsl(var(--foreground-muted))]">
+              Send a message to {activeContact?.username || 'this contact'}
+            </p>
+          </div>
         </div>
       ) : (
         <SimpleMessageList

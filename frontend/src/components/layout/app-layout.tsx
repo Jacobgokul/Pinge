@@ -1,114 +1,62 @@
-import { useState } from 'react';
-import { Link, useLocation } from '@tanstack/react-router';
-import { MessageSquare, Users, UsersRound, Settings, Menu, X } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { Button } from '@/components/ui/button';
-import { UserAvatar } from '@/components/ui/avatar';
-import { useAuthStore } from '@/stores/auth.store';
+import { FloatingDock } from './floating-dock';
+import { useUnreadCount } from '@/features/chat/hooks';
+import { useContactRequests } from '@/features/contacts/hooks';
+import { useGlobalSubscriptions } from '@/hooks/use-global-subscriptions';
 
 interface AppLayoutProps {
   children: React.ReactNode;
+  /** Hide dock for immersive views like chat */
+  hideDock?: boolean;
 }
 
-// Navigation items
-const navItems = [
-  { to: '/chat', icon: MessageSquare, label: 'Chats' },
-  { to: '/contacts', icon: Users, label: 'Contacts' },
-  { to: '/groups', icon: UsersRound, label: 'Groups' },
-  { to: '/settings', icon: Settings, label: 'Settings' },
-] as const;
-
 /**
- * Main app layout with sidebar navigation
- * Responsive: drawer on mobile, fixed sidebar on desktop
+ * Main app layout with floating dock navigation
+ * Clean, modern design without traditional sidebar
  */
-function AppLayout({ children }: AppLayoutProps) {
-  const [sidebarOpen, setSidebarOpen] = useState(false);
-  const location = useLocation();
-  const user = useAuthStore((s) => s.user);
+function AppLayout({ children, hideDock = false }: AppLayoutProps) {
+  // Global WebSocket subscriptions for real-time updates
+  useGlobalSubscriptions();
+
+  // Get real-time unread counts
+  const { data: unreadData } = useUnreadCount();
+  const { data: contactRequests } = useContactRequests();
+
+  const unreadMessages = (unreadData?.total_unread || 0) + (unreadData?.total_group_unread || 0);
+  const pendingRequests = contactRequests?.length || 0;
 
   return (
-    <div className="flex h-screen bg-[hsl(var(--background))]">
-      {/* Mobile overlay */}
-      {sidebarOpen && (
+    <div className="relative min-h-screen bg-[hsl(var(--background))]">
+      {/* Background gradient effects */}
+      <div className="fixed inset-0 overflow-hidden pointer-events-none">
         <div
-          className="fixed inset-0 z-40 bg-black/50 lg:hidden"
-          onClick={() => setSidebarOpen(false)}
+          className="absolute -top-[30%] -left-[10%] w-[50%] h-[50%] bg-orb bg-orb-coral opacity-[0.03]"
+          style={{ filter: 'blur(100px)' }}
         />
-      )}
-
-      {/* Sidebar */}
-      <aside
-        className={cn(
-          'fixed inset-y-0 left-0 z-50 flex w-64 flex-col',
-          'bg-[hsl(var(--card))] border-r border-[hsl(var(--border))]',
-          'transform transition-transform duration-200 ease-in-out',
-          'lg:relative lg:translate-x-0',
-          sidebarOpen ? 'translate-x-0' : '-translate-x-full'
-        )}
-      >
-        {/* Header */}
-        <div className="flex h-16 items-center justify-between border-b border-[hsl(var(--border))] px-4">
-          <span className="text-xl font-bold text-[hsl(var(--primary))]">Pinge</span>
-          <Button
-            variant="ghost"
-            size="icon"
-            className="lg:hidden"
-            onClick={() => setSidebarOpen(false)}
-          >
-            <X className="h-5 w-5" />
-          </Button>
-        </div>
-
-        {/* Navigation */}
-        <nav className="flex-1 space-y-1 p-3">
-          {navItems.map((item) => {
-            const isActive = location.pathname.startsWith(item.to);
-            return (
-              <Link
-                key={item.to}
-                to={item.to}
-                className={cn(
-                  'flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium',
-                  'transition-colors hover:bg-[hsl(var(--secondary))]',
-                  isActive
-                    ? 'bg-[hsl(var(--primary))] text-[hsl(var(--primary-foreground))]'
-                    : 'text-[hsl(var(--foreground-secondary))]'
-                )}
-                onClick={() => setSidebarOpen(false)}
-              >
-                <item.icon className="h-5 w-5" />
-                {item.label}
-              </Link>
-            );
-          })}
-        </nav>
-
-        {/* User section */}
-        <div className="border-t border-[hsl(var(--border))] p-4">
-          <div className="flex items-center gap-3">
-            <UserAvatar name={user?.username || 'User'} size="sm" status="online" />
-            <div className="flex-1 truncate">
-              <p className="text-sm font-medium truncate">{user?.username || 'User'}</p>
-              <p className="text-xs text-[hsl(var(--foreground-muted))] truncate">{user?.email}</p>
-            </div>
-          </div>
-        </div>
-      </aside>
+        <div
+          className="absolute -bottom-[20%] -right-[10%] w-[40%] h-[40%] bg-orb bg-orb-cyan opacity-[0.03]"
+          style={{ filter: 'blur(100px)' }}
+        />
+      </div>
 
       {/* Main content */}
-      <div className="flex flex-1 flex-col overflow-hidden">
-        {/* Mobile header */}
-        <header className="flex h-16 items-center gap-4 border-b border-[hsl(var(--border))] px-4 lg:hidden">
-          <Button variant="ghost" size="icon" onClick={() => setSidebarOpen(true)}>
-            <Menu className="h-5 w-5" />
-          </Button>
-          <span className="text-lg font-semibold">Pinge</span>
-        </header>
+      <main
+        className={cn(
+          'relative z-10 min-h-screen',
+          // Add bottom padding for dock
+          !hideDock && 'pb-24 sm:pb-28'
+        )}
+      >
+        {children}
+      </main>
 
-        {/* Page content */}
-        <main className="flex-1 overflow-hidden">{children}</main>
-      </div>
+      {/* Floating navigation dock */}
+      {!hideDock && (
+        <FloatingDock
+          unreadCount={unreadMessages}
+          notificationCount={pendingRequests}
+        />
+      )}
     </div>
   );
 }

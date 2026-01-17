@@ -1,15 +1,15 @@
-import { Moon, Sun, Monitor, LogOut, User, Bell, Shield, Palette } from 'lucide-react';
+import { Link } from '@tanstack/react-router';
+import { Moon, Sun, Monitor, LogOut, User, Bell, Shield, Palette, ChevronRight, Mail } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { Label } from '@/components/ui/label';
-import { Separator } from '@/components/ui/separator';
 import { UserAvatar } from '@/components/ui/avatar';
+import { ScrollArea } from '@/components/ui/scroll-area';
 import { useAuthStore } from '@/stores/auth.store';
 import { useThemeStore } from '@/stores/theme.store';
 import { useLogout } from '@/features/auth/hooks';
 import { cn } from '@/lib/utils';
 
 /**
- * Settings view with theme and account options
+ * Settings view with modern card-based design
  */
 function SettingsView() {
   const user = useAuthStore((s) => s.user);
@@ -25,90 +25,151 @@ function SettingsView() {
   return (
     <div className="flex h-full flex-col bg-[hsl(var(--background))]">
       {/* Header */}
-      <header className="border-b border-[hsl(var(--border))] bg-[hsl(var(--card))] p-4">
-        <h1 className="text-xl font-bold">Settings</h1>
-      </header>
+      <div className="p-4 sm:p-6">
+        <h1 className="text-2xl sm:text-3xl font-bold">Settings</h1>
+      </div>
 
       {/* Content */}
-      <div className="flex-1 overflow-y-auto p-4">
-        {/* Profile section */}
-        <section className="rounded-lg border border-[hsl(var(--border))] bg-[hsl(var(--card))] p-4">
-          <div className="flex items-center gap-4">
-            <UserAvatar name={user?.username || 'User'} size="xl" />
-            <div className="flex-1">
-              <h2 className="text-lg font-semibold">{user?.username}</h2>
-              <p className="text-sm text-[hsl(var(--foreground-muted))]">{user?.email}</p>
+      <ScrollArea className="flex-1 px-4 sm:px-6">
+        <div className="pb-6 space-y-6">
+          {/* Profile section */}
+          <Link
+            to="/settings"
+            className="block bg-[hsl(var(--card))] border border-[hsl(var(--border))] rounded-2xl p-5 transition-all duration-200 hover:border-[hsl(var(--primary)/0.3)] hover:shadow-lg"
+          >
+            <div className="flex items-center gap-4">
+              <UserAvatar name={user?.username || 'User'} size="xl" />
+              <div className="flex-1 min-w-0">
+                <h2 className="text-lg font-semibold truncate">{user?.username}</h2>
+                <p className="text-sm text-[hsl(var(--foreground-muted))] flex items-center gap-1.5 truncate">
+                  <Mail className="w-3.5 h-3.5 shrink-0" />
+                  {user?.email}
+                </p>
+              </div>
+              <ChevronRight className="w-5 h-5 text-[hsl(var(--foreground-muted))]" />
             </div>
-            <Button variant="outline" size="sm">
-              <User className="mr-2 h-4 w-4" />
-              Edit Profile
-            </Button>
-          </div>
-        </section>
+          </Link>
 
-        {/* Theme section */}
-        <section className="mt-6">
-          <div className="mb-3 flex items-center gap-2">
-            <Palette className="h-5 w-5 text-[hsl(var(--foreground-muted))]" />
-            <h3 className="font-semibold">Appearance</h3>
-          </div>
-          <div className="rounded-lg border border-[hsl(var(--border))] bg-[hsl(var(--card))] p-4">
-            <Label className="mb-3 block">Theme</Label>
-            <div className="flex gap-2">
+          {/* Theme section */}
+          <div className="bg-[hsl(var(--card))] border border-[hsl(var(--border))] rounded-2xl p-5">
+            <div className="flex items-center gap-3 mb-4">
+              <div className="w-10 h-10 rounded-xl bg-gradient-accent flex items-center justify-center">
+                <Palette className="h-5 w-5 text-white" />
+              </div>
+              <div>
+                <h3 className="font-semibold">Appearance</h3>
+                <p className="text-sm text-[hsl(var(--foreground-muted))]">Choose your theme</p>
+              </div>
+            </div>
+            <div className="grid grid-cols-3 gap-3">
               {themeOptions.map((option) => (
                 <button
                   key={option.value}
                   onClick={() => setTheme(option.value)}
                   className={cn(
-                    'flex flex-1 flex-col items-center gap-2 rounded-lg border p-4 transition-colors',
+                    'flex flex-col items-center gap-2 rounded-xl border p-4 transition-all duration-200',
                     theme === option.value
-                      ? 'border-[hsl(var(--primary))] bg-[hsl(var(--primary))]/10'
-                      : 'border-[hsl(var(--border))] hover:bg-[hsl(var(--secondary))]'
+                      ? 'border-[hsl(var(--primary))] bg-[hsl(var(--primary)/0.05)]'
+                      : 'border-[hsl(var(--border))] hover:border-[hsl(var(--primary)/0.3)] hover:bg-[hsl(var(--secondary))]'
                   )}
                 >
-                  <option.icon className="h-6 w-6" />
-                  <span className="text-sm font-medium">{option.label}</span>
+                  <option.icon
+                    className={cn(
+                      'h-6 w-6 transition-colors',
+                      theme === option.value
+                        ? 'text-[hsl(var(--primary))]'
+                        : 'text-[hsl(var(--foreground-muted))]'
+                    )}
+                  />
+                  <span
+                    className={cn(
+                      'text-sm font-medium',
+                      theme === option.value && 'text-[hsl(var(--primary))]'
+                    )}
+                  >
+                    {option.label}
+                  </span>
                 </button>
               ))}
             </div>
           </div>
-        </section>
 
-        {/* Notifications section */}
-        <section className="mt-6">
-          <div className="mb-3 flex items-center gap-2">
-            <Bell className="h-5 w-5 text-[hsl(var(--foreground-muted))]" />
-            <h3 className="font-semibold">Notifications</h3>
-          </div>
-          <div className="rounded-lg border border-[hsl(var(--border))] bg-[hsl(var(--card))] p-4">
-            <p className="text-sm text-[hsl(var(--foreground-muted))]">
-              Notification settings coming soon
-            </p>
-          </div>
-        </section>
+          {/* Settings list */}
+          <div className="bg-[hsl(var(--card))] border border-[hsl(var(--border))] rounded-2xl overflow-hidden">
+            {/* Notifications */}
+            <SettingsItem
+              icon={Bell}
+              iconBg="bg-[hsl(var(--accent-pink))]"
+              title="Notifications"
+              description="Manage your alerts"
+            />
 
-        {/* Privacy section */}
-        <section className="mt-6">
-          <div className="mb-3 flex items-center gap-2">
-            <Shield className="h-5 w-5 text-[hsl(var(--foreground-muted))]" />
-            <h3 className="font-semibold">Privacy & Security</h3>
+            {/* Privacy */}
+            <SettingsItem
+              icon={Shield}
+              iconBg="bg-[hsl(var(--accent-purple))]"
+              title="Privacy & Security"
+              description="Control your data"
+              isLast
+            />
           </div>
-          <div className="rounded-lg border border-[hsl(var(--border))] bg-[hsl(var(--card))] p-4">
-            <p className="text-sm text-[hsl(var(--foreground-muted))]">
-              Privacy settings coming soon
-            </p>
+
+          {/* Account section */}
+          <div className="bg-[hsl(var(--card))] border border-[hsl(var(--border))] rounded-2xl overflow-hidden">
+            <SettingsItem
+              icon={User}
+              iconBg="bg-[hsl(var(--accent-gold))]"
+              title="Account"
+              description="Manage your account settings"
+              isLast
+            />
           </div>
-        </section>
 
-        <Separator className="my-6" />
+          {/* Logout button */}
+          <Button
+            variant="outline"
+            className="w-full h-14 rounded-2xl border-[hsl(var(--destructive)/0.3)] hover:bg-[hsl(var(--destructive)/0.1)] hover:border-[hsl(var(--destructive))] text-[hsl(var(--destructive))] font-semibold"
+            onClick={logout}
+          >
+            <LogOut className="mr-2 h-5 w-5" />
+            Sign Out
+          </Button>
 
-        {/* Logout */}
-        <Button variant="destructive" className="w-full" onClick={logout}>
-          <LogOut className="mr-2 h-4 w-4" />
-          Sign Out
-        </Button>
-      </div>
+          {/* Version info */}
+          <p className="text-center text-sm text-[hsl(var(--foreground-muted))]">
+            Pinge v1.0.0
+          </p>
+        </div>
+      </ScrollArea>
     </div>
+  );
+}
+
+interface SettingsItemProps {
+  icon: React.ElementType;
+  iconBg: string;
+  title: string;
+  description: string;
+  isLast?: boolean;
+}
+
+function SettingsItem({ icon: Icon, iconBg, title, description, isLast = false }: SettingsItemProps) {
+  return (
+    <button
+      className={cn(
+        'w-full flex items-center gap-4 p-4 transition-colors hover:bg-[hsl(var(--secondary))]',
+        !isLast && 'border-b border-[hsl(var(--border))]'
+      )}
+    >
+      <div className={cn('w-10 h-10 rounded-xl flex items-center justify-center', iconBg)}>
+        <Icon className="h-5 w-5 text-white" />
+      </div>
+      <div className="flex-1 text-left">
+        <h4 className="font-medium">{title}</h4>
+        <p className="text-sm text-[hsl(var(--foreground-muted))]">{description}</p>
+      </div>
+      <ChevronRight className="w-5 h-5 text-[hsl(var(--foreground-muted))]" />
+    </button>
   );
 }
 

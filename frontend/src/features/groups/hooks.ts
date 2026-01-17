@@ -154,6 +154,42 @@ export function useLeaveGroup() {
 }
 
 /**
+ * Hook for adding members to a group
+ */
+export function useAddGroupMembers(groupId: string) {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (userIds: string[]) => groupsService.addMembers(groupId, { user_ids: userIds }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.GROUPS.MEMBERS(groupId) });
+      toast.success('Members added successfully');
+    },
+    onError: (error: Error) => {
+      toast.error(error.message || 'Failed to add members');
+    },
+  });
+}
+
+/**
+ * Hook for removing a member from a group
+ */
+export function useRemoveGroupMember(groupId: string) {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (userId: string) => groupsService.removeMember(groupId, userId),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.GROUPS.MEMBERS(groupId) });
+      toast.success('Member removed');
+    },
+    onError: (error: Error) => {
+      toast.error(error.message || 'Failed to remove member');
+    },
+  });
+}
+
+/**
  * Hook for real-time group message updates via WebSocket
  */
 export function useGroupMessageSubscription() {

@@ -28,11 +28,12 @@ function ChatView() {
   };
 
   return (
-    <div className="flex h-full">
+    <div className="flex h-[calc(100vh-6rem)] sm:h-[calc(100vh-7rem)]">
       {/* Conversation list - hidden on mobile when viewing chat */}
       <div
         className={cn(
-          'w-full border-r border-[hsl(var(--border))] lg:w-80',
+          'w-full lg:w-[380px] xl:w-[420px]',
+          'border-r border-[hsl(var(--border))]',
           showChat && hasActiveConversation ? 'hidden lg:block' : 'block'
         )}
       >
@@ -43,8 +44,8 @@ function ChatView() {
       <div
         className={cn(
           'flex-1',
-          !showChat && hasActiveConversation ? 'hidden lg:block' : 'block',
-          !hasActiveConversation && 'hidden lg:block'
+          !showChat && hasActiveConversation ? 'hidden lg:flex' : 'flex',
+          !hasActiveConversation && 'hidden lg:flex'
         )}
       >
         {activeGroupId ? (
